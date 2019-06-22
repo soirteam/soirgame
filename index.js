@@ -126,10 +126,14 @@ function update() {
         if (cursors.down.isDown) {
             player.setVelocityX(0);
             digging = true;
+            player.body.enable = false;
             player.anims.play('digging_start', true);
             setTimeout(() => {
                 player.anims.play('digging_end', true);
-                setTimeout(() => { digging = false; }, 400);
+                setTimeout(() => {
+                    digging = false;
+                    player.body.enable = true;
+                }, 400);
             }, 1000);
         }
         else if (cursors.left.isDown) {
