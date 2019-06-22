@@ -32,6 +32,16 @@ const specialDrugsList = [
         effect: () => console.log("CANNABIS taken"),
         score: 100,
     },
+    {
+        sprite: 'cactus',
+        effect: () => console.log("CACTUS SAN PEDRO taken"),
+        score: 120,
+    },
+    {
+        sprite: 'amanite',
+        effect: () => console.log("AMANITE TUE MOUCHE taken"),
+        score: -50,
+    },
 ];
 
 const default_drug = {
@@ -60,6 +70,8 @@ function preload() {
     this.load.image('lsd', 'assets/lsd.png');
     this.load.image('cannabis', 'assets/cannabis.png');
     this.load.image('mdma', 'assets/redbull.png');
+    this.load.image('amanite', 'assets/amanite.png');
+    this.load.image('cactus', 'assets/cactus.png');
     this.load.image('default_pill', 'assets/default_pill.png');
     this.load.spritesheet('laser', 'assets/lasoir.png', { frameWidth: 800, frameHeight: 200 });
     this.load.spritesheet('dude', 'assets/SoirMole.png', { frameWidth: 38, frameHeight: 25 });
