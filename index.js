@@ -25,6 +25,7 @@ var score = 0;
 var gameOver = false;
 var scoreText;
 var turn_left = false;
+var digging = false;
 
 var game = new Phaser.Game(config);
 
@@ -81,6 +82,19 @@ function create() {
         frameRate: 20
     });
 
+    this.anims.create({
+        key: 'digging_start',
+        frames: this.anims.generateFrameNumbers('dude', { start: 11, end: 15 }),
+        frameRate: 10,
+    });
+
+
+    this.anims.create({
+        key: 'digging_end',
+        frames: this.anims.generateFrameNumbers('dude', { start: 8, end: 11 }),
+        frameRate: 10,
+    });
+
     //  Input Events
     cursors = this.input.keyboard.createCursorKeys();
 
@@ -107,25 +121,37 @@ function update() {
         return;
     }
 
-    if (cursors.left.isDown) {
-        player.setVelocityX(-240);
-        turn_left = true;
-
-        player.anims.play('left', true);
-    }
-    else if (cursors.right.isDown) {
-        player.setVelocityX(240);
-        turn_left = false;
-
-        player.anims.play('right', true);
-    }
-    else {
+    if (cursors.down.isDown) {
         player.setVelocityX(0);
+        digging = true;
+        player.anims.play('digging_start', true);
+        setTimeout(() => {
+            player.anims.play('digging_end', true);
+            setTimeout(() => { digging = false; }, 400);
+        }, 1000);
+    }
 
-        if (turn_left) {
-            player.anims.play('turn_left');
-        } else {
-            player.anims.play('turn_right');
+    if (!digging) {
+        if (cursors.left.isDown) {
+            player.setVelocityX(-240);
+            turn_left = true;
+
+            player.anims.play('left', true);
+        }
+        else if (cursors.right.isDown) {
+            player.setVelocityX(240);
+            turn_left = false;
+
+            player.anims.play('right', true);
+        }
+        else {
+            player.setVelocityX(0);
+
+            if (turn_left) {
+                player.anims.play('turn_left');
+            } else {
+                player.anims.play('turn_right');
+            }
         }
     }
 
@@ -139,16 +165,14 @@ function update() {
 }
 
 function collectDrug(player, drug) {
-    drug.disableBody(true, true);
+    drug.destroy();
 
-    //  Add and update the score
     score += 10;
     scoreText.setText('Score: ' + score);
 }
 
 function drugHit(drug, platform) {
-    drug.disableBody(true, true);
-    console.log("TATA !! ");
+    drug.destroy();
 }
 
 function addDrug() {
