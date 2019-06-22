@@ -17,7 +17,6 @@ const config = {
 };
 
 var player;
-var stars;
 var drugs;
 var platforms;
 var cursors;
@@ -25,13 +24,13 @@ var score = 0;
 var gameOver = false;
 var scoreText;
 var turn_left = false;
+var digging = false;
 
 var game = new Phaser.Game(config);
 
 function preload() {
     this.load.image("tiles", "assets/platformertiles.png");
     this.load.tilemapTiledJSON("map", "assets/soir_platform.json");
-    this.load.image('star', 'assets/star.png');
     this.load.image('drug', 'assets/bomb.png');
     this.load.spritesheet('dude', 'assets/SoirMole.png', { frameWidth: 38, frameHeight: 25 });
 }
@@ -86,11 +85,21 @@ function create() {
         frameRate: 20
     });
 
+    this.anims.create({
+        key: 'digging_start',
+        frames: this.anims.generateFrameNumbers('dude', { start: 11, end: 15 }),
+        frameRate: 10,
+    });
+
+
+    this.anims.create({
+        key: 'digging_end',
+        frames: this.anims.generateFrameNumbers('dude', { start: 8, end: 11 }),
+        frameRate: 10,
+    });
+
     //  Input Events
     cursors = this.input.keyboard.createCursorKeys();
-
-    stars = this.physics.add.group();
-
 
     drugs = this.physics.add.group();
 
@@ -112,30 +121,45 @@ function update() {
         return;
     }
 
-    if (cursors.left.isDown) {
-        player.setVelocityX(-240);
-        turn_left = true;
 
-        player.anims.play('left', true);
-    }
-    else if (cursors.right.isDown) {
-        player.setVelocityX(240);
-        turn_left = false;
-
-        player.anims.play('right', true);
-    }
-    else {
-        player.setVelocityX(0);
-
-        if (turn_left) {
-            player.anims.play('turn_left');
-        } else {
-            player.anims.play('turn_right');
+    if (!digging) {
+        if (cursors.down.isDown) {
+            player.setVelocityX(0);
+            digging = true;
+            player.body.enable = false;
+            player.anims.play('digging_start', true);
+            setTimeout(() => {
+                player.anims.play('digging_end', true);
+                setTimeout(() => {
+                    digging = false;
+                    player.body.enable = true;
+                }, 400);
+            }, 1000);
         }
-    }
+        else if (cursors.left.isDown) {
+            player.setVelocityX(-240);
+            turn_left = true;
 
-    if (cursors.up.isDown && player.body.touching.down) {
-        player.setVelocityY(-330);
+            player.anims.play('left', true);
+        }
+        else if (cursors.right.isDown) {
+            player.setVelocityX(240);
+            turn_left = false;
+
+            player.anims.play('right', true);
+        }
+        else {
+            player.setVelocityX(0);
+
+            if (turn_left) {
+                player.anims.play('turn_left');
+            } else {
+                player.anims.play('turn_right');
+            }
+        }
+        if (cursors.up.isDown && player.body.touching.down) {
+            player.setVelocityY(-330);
+        }
     }
 
     if (Math.floor(Math.random() * 30) === 0) {
@@ -144,20 +168,19 @@ function update() {
 }
 
 function collectDrug(player, drug) {
-    drug.disableBody(true, true);
+    drug.destroy();
 
-    //  Add and update the score
     score += 10;
     scoreText.setText('Score: ' + score);
 }
 
 function drugHit(drug, platform) {
-    drug.disableBody(true, true);
-    console.log("TATA !! ");
+    drug.destroy();
 }
 
 function addDrug() {
     const x = Math.floor(Math.random() * 800);
     let drug = drugs.create(x, 0, 'drug');
-    drug.setVelocity(0, 20);
+    drug.setVelocity(0, 80);
+    drug.body.setAllowGravity(false);
 }
