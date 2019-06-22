@@ -17,7 +17,6 @@ const config = {
 };
 
 var player;
-var stars;
 var drugs;
 var platforms;
 var cursors;
@@ -32,7 +31,6 @@ var game = new Phaser.Game(config);
 function preload() {
     this.load.image('sky', 'assets/sky.png');
     this.load.image('ground', 'assets/platform.png');
-    this.load.image('star', 'assets/star.png');
     this.load.image('drug', 'assets/bomb.png');
     this.load.spritesheet('dude', 'assets/SoirMole.png', { frameWidth: 38, frameHeight: 25 });
 }
@@ -98,17 +96,13 @@ function create() {
     //  Input Events
     cursors = this.input.keyboard.createCursorKeys();
 
-    stars = this.physics.add.group();
-
-
     drugs = this.physics.add.group();
 
     //  The score
     scoreText = this.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000' });
 
-    //  Collide the player and the stars with the platforms
+    //  Collide the player with the platforms
     this.physics.add.collider(player, platforms);
-    this.physics.add.collider(stars, platforms);
 
     //  Checks to see if the player overlaps with any of the stars, if he does call the collectStar function
     this.physics.add.overlap(player, drugs, collectDrug, null, this);
