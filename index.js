@@ -184,7 +184,7 @@ function update() {
         }
     }
 
-    if (Math.floor(Math.random() * 300) === 0) {
+    if (Math.floor(Math.random() * 3000) === 0) {
         shootLaser();
     }
 
