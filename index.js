@@ -16,9 +16,33 @@ const config = {
     }
 };
 
-var laser;
+const specialDrugsList = [
+    {
+        sprite: 'mdma',
+        effect: () => console.log("MDMA taken"),
+        score: 100,
+    },
+    {
+        sprite: 'lsd',
+        effect: () => console.log("LSD taken"),
+        score: 100,
+    },
+    {
+        sprite: 'cannabis',
+        effect: () => console.log("CANNABIS taken"),
+        score: 100,
+    },
+];
+
+const default_drug = {
+    sprite: 'default_pill',
+    effect: undefined,
+    score: 5,
+};
+
 var player;
 var drugs;
+var laser;
 var platforms;
 var cursors;
 var score = 0;
@@ -32,19 +56,16 @@ var game = new Phaser.Game(config);
 function preload() {
     this.load.image("tiles", "assets/platformertiles.png");
     this.load.tilemapTiledJSON("map", "assets/soir_platform.json");
-    this.load.image('drug', 'assets/redbull.png');
+    this.load.image('mdma', 'assets/redbull.png');
+    this.load.image('lsd', 'assets/lsd.png');
+    this.load.image('cannabis', 'assets/cannabis.png');
+    this.load.image('mdma', 'assets/redbull.png');
+    this.load.image('default_pill', 'assets/default_pill.png');
     this.load.spritesheet('laser', 'assets/lasoir.png', { frameWidth: 800, frameHeight: 200 });
     this.load.spritesheet('dude', 'assets/SoirMole.png', { frameWidth: 38, frameHeight: 25 });
 }
 
 function create() {
-    //  The platforms group contains the ground and the 2 ledges we can jump on
-    // platforms = this.physics.add.staticGroup();
-
-    //  Here we create the ground.
-    //  Scale it to fit the width of the game (the original sprite is 400x32 in size)
-    // platforms.create(400, 568, 'ground').setScale(2).refreshBody();
-
     this.map = this.add.tilemap("map");
     var tileset = this.map.addTilesetImage("platformertiles", "tiles");
     this.backgroundlayer = this.map.createStaticLayer("Background", tileset);
@@ -112,7 +133,7 @@ function create() {
     laser.body.enable = false
 
     //  The score
-    scoreText = this.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000' });
+    scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '32px', fill: '#fff' });
 
     //  Collide the player and the stars with the platforms
     this.physics.add.collider(player, this.groundLayer);
@@ -159,7 +180,6 @@ function update() {
             }
         }
         if (cursors.up.isDown && player.body.blocked.down) {
-            console.log("AAAAAAA");
             player.setVelocityY(-330);
         }
     }
@@ -188,9 +208,12 @@ function dig(player) {
 }
 
 function collectDrug(player, drug) {
+    if (drug.type.effect) {
+        drug.type.effect(player);
+    }
     drug.destroy();
 
-    score += 10;
+    score += drug.type.score;
     scoreText.setText('Score: ' + score);
 }
 
@@ -199,9 +222,11 @@ function drugHit(drug, platform) {
 }
 
 function addDrug() {
+    const type = Math.floor(Math.random() * 20) === 0 ? specialDrugsList[Math.floor(Math.random() * specialDrugsList.length)] : default_drug;
     const x = Math.floor(Math.random() * 800);
-    let drug = drugs.create(x, 0, 'drug').setScale(0.5);
+    let drug = drugs.create(x, 0, type.sprite).setScale(0.5);
     drug.setVelocity(0, 80);
+    drug.type = type;
     drug.setAngularVelocity(Math.random() * 500 - 250);
     drug.body.setAllowGravity(false);
 }
