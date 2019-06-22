@@ -29,21 +29,27 @@ var digging = false;
 var game = new Phaser.Game(config);
 
 function preload() {
-    this.load.image('sky', 'assets/sky.png');
-    this.load.image('ground', 'assets/platform.png');
+    this.load.image("tiles", "assets/platformertiles.png");
+    this.load.tilemapTiledJSON("map", "assets/soir_platform.json");
     this.load.image('drug', 'assets/redbull.png');
     this.load.spritesheet('dude', 'assets/SoirMole.png', { frameWidth: 38, frameHeight: 25 });
 }
 
 function create() {
-    //  A simple background for our game
-    this.add.image(400, 300, 'sky');
-
-    platforms = this.physics.add.staticGroup();
+    //  The platforms group contains the ground and the 2 ledges we can jump on
+    // platforms = this.physics.add.staticGroup();
 
     //  Here we create the ground.
     //  Scale it to fit the width of the game (the original sprite is 400x32 in size)
-    platforms.create(400, 568, 'ground').setScale(2).refreshBody();
+    // platforms.create(400, 568, 'ground').setScale(2).refreshBody();
+
+    this.map = this.add.tilemap("map");
+    var tileset = this.map.addTilesetImage("platformertiles", "tiles");
+    this.backgroundlayer = this.map.createStaticLayer("Background", tileset);
+    this.groundLayer = this.map.createStaticLayer("Ground", tileset);
+
+    //Before you can use the collide function you need to set what tiles can collide
+    this.groundLayer.setCollisionBetween(0, 800);
 
     // The player and its settings
     player = this.physics.add.sprite(100, 450, 'dude');
@@ -96,13 +102,13 @@ function create() {
     //  The score
     scoreText = this.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000' });
 
-    //  Collide the player with the platforms
-    this.physics.add.collider(player, platforms);
+    //  Collide the player and the stars with the platforms
+    this.physics.add.collider(player, this.groundLayer);
 
     //  Checks to see if the player overlaps with any of the stars, if he does call the collectStar function
     this.physics.add.overlap(player, drugs, collectDrug, null, this);
 
-    this.physics.add.collider(drugs, platforms, drugHit, null, this);
+    this.physics.add.collider(drugs, this.groundLayer, drugHit, null, this);
 }
 
 function update() {
@@ -136,6 +142,7 @@ function update() {
             }
         }
         if (cursors.up.isDown && player.body.touching.down) {
+            console.log("AAAAAAA");
             player.setVelocityY(-330);
         }
     }
