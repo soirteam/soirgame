@@ -141,7 +141,7 @@ function update() {
                 player.anims.play('turn_right');
             }
         }
-        if (cursors.up.isDown && player.body.touching.down) {
+        if (cursors.up.isDown && player.body.blocked.down) {
             console.log("AAAAAAA");
             player.setVelocityY(-330);
         }
