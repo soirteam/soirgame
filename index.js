@@ -20,20 +20,24 @@ const specialDrugsList = [
     {
         sprite: 'mdma',
         effect: () => console.log("MDMA taken"),
+        score: 100,
     },
     {
         sprite: 'lsd',
         effect: () => console.log("LSD taken"),
+        score: 100,
     },
     {
         sprite: 'cannabis',
         effect: () => console.log("CANNABIS taken"),
+        score: 100,
     },
 ];
 
 const default_drug = {
     sprite: 'default_pill',
     effect: undefined,
+    score: 5,
 };
 
 var player;
@@ -183,12 +187,12 @@ function dig(player) {
 }
 
 function collectDrug(player, drug) {
-    if (drug.effect) {
-        drug.effect(player);
+    if (drug.type.effect) {
+        drug.type.effect(player);
     }
     drug.destroy();
 
-    score += 10;
+    score += drug.type.score;
     scoreText.setText('Score: ' + score);
 }
 
@@ -201,7 +205,7 @@ function addDrug() {
     const x = Math.floor(Math.random() * 800);
     let drug = drugs.create(x, 0, type.sprite).setScale(0.5);
     drug.setVelocity(0, 80);
-    drug.effect = type.effect;
+    drug.type = type;
     drug.setAngularVelocity(Math.random() * 500 - 250);
     drug.body.setAllowGravity(false);
 }
