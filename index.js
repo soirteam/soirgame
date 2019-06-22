@@ -121,18 +121,18 @@ function update() {
         return;
     }
 
-    if (cursors.down.isDown) {
-        player.setVelocityX(0);
-        digging = true;
-        player.anims.play('digging_start', true);
-        setTimeout(() => {
-            player.anims.play('digging_end', true);
-            setTimeout(() => { digging = false; }, 400);
-        }, 1000);
-    }
 
     if (!digging) {
-        if (cursors.left.isDown) {
+        if (cursors.down.isDown) {
+            player.setVelocityX(0);
+            digging = true;
+            player.anims.play('digging_start', true);
+            setTimeout(() => {
+                player.anims.play('digging_end', true);
+                setTimeout(() => { digging = false; }, 400);
+            }, 1000);
+        }
+        else if (cursors.left.isDown) {
             player.setVelocityX(-240);
             turn_left = true;
 
@@ -153,10 +153,9 @@ function update() {
                 player.anims.play('turn_right');
             }
         }
-    }
-
-    if (cursors.up.isDown && player.body.touching.down) {
-        player.setVelocityY(-330);
+        if (cursors.up.isDown && player.body.touching.down) {
+            player.setVelocityY(-330);
+        }
     }
 
     if (Math.floor(Math.random() * 30) === 0) {
@@ -178,5 +177,6 @@ function drugHit(drug, platform) {
 function addDrug() {
     const x = Math.floor(Math.random() * 800);
     let drug = drugs.create(x, 0, 'drug');
-    drug.setVelocity(0, 20);
+    drug.setVelocity(0, 80);
+    drug.body.setAllowGravity(false);
 }
