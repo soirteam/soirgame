@@ -117,7 +117,7 @@ function update() {
     }
 
     if (!digging) {
-        if (cursors.down.isDown) {
+        if (cursors.down.isDown && player.body.blocked.down) {
             dig(player);
         }
         else if (cursors.left.isDown) {
