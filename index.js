@@ -16,6 +16,7 @@ const config = {
     }
 };
 
+var laser;
 var player;
 var drugs;
 var platforms;
@@ -32,6 +33,7 @@ function preload() {
     this.load.image("tiles", "assets/platformertiles.png");
     this.load.tilemapTiledJSON("map", "assets/soir_platform.json");
     this.load.image('drug', 'assets/redbull.png');
+    this.load.spritesheet('laser', 'assets/lasoir.png', { frameWidth: 800, frameHeight: 200 });
     this.load.spritesheet('dude', 'assets/SoirMole.png', { frameWidth: 38, frameHeight: 25 });
 }
 
@@ -94,10 +96,20 @@ function create() {
         frameRate: 10,
     });
 
+    this.anims.create({
+        key: 'laser_shot',
+        frames: this.anims.generateFrameNumbers('laser', { start: 1, end: 3 }),
+        frameRate: 1,
+    })
+
     //  Input Events
     cursors = this.input.keyboard.createCursorKeys();
 
     drugs = this.physics.add.group();
+
+    laser = this.physics.add.sprite(400, 485, 'laser');
+    laser.body.setAllowGravity(false)
+    laser.body.enable = false
 
     //  The score
     scoreText = this.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000' });
@@ -107,12 +119,17 @@ function create() {
 
     //  Checks to see if the player overlaps with any of the stars, if he does call the collectStar function
     this.physics.add.overlap(player, drugs, collectDrug, null, this);
-
+    this.physics.add.overlap(player, laser, endGame, null, this)
     this.physics.add.collider(drugs, this.groundLayer, drugHit, null, this);
 }
 
 function update() {
     if (gameOver) {
+        if (cursors.space.isDown) {
+            gameOver = false
+            score = 0
+            this.scene.restart();
+        }
         return;
     }
 
@@ -145,6 +162,10 @@ function update() {
             console.log("AAAAAAA");
             player.setVelocityY(-330);
         }
+    }
+
+    if (Math.floor(Math.random() * 300) === 0) {
+        shootLaser();
     }
 
     if (Math.floor(Math.random() * 30) === 0) {
@@ -183,4 +204,16 @@ function addDrug() {
     drug.setVelocity(0, 80);
     drug.setAngularVelocity(Math.random() * 500 - 250);
     drug.body.setAllowGravity(false);
+}
+
+function shootLaser() {
+    setTimeout(function(){ laser.body.enable = true }, 1000);
+    setTimeout(function(){ laser.body.enable = false }, 2000);
+    laser.anims.play('laser_shot', false);
+}
+
+function endGame() {
+    player.body.enable = false;
+    this.add.text(240, 200, 'GAME OVER', { fontSize: '60px', fill: '#fff' });
+    gameOver = true
 }
