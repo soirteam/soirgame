@@ -31,7 +31,7 @@ var game = new Phaser.Game(config);
 function preload() {
     this.load.image('sky', 'assets/sky.png');
     this.load.image('ground', 'assets/platform.png');
-    this.load.image('drug', 'assets/bomb.png');
+    this.load.image('drug', 'assets/redbull.png');
     this.load.spritesheet('dude', 'assets/SoirMole.png', { frameWidth: 38, frameHeight: 25 });
 }
 
@@ -39,7 +39,6 @@ function create() {
     //  A simple background for our game
     this.add.image(400, 300, 'sky');
 
-    //  The platforms group contains the ground and the 2 ledges we can jump on
     platforms = this.physics.add.staticGroup();
 
     //  Here we create the ground.
@@ -48,10 +47,6 @@ function create() {
 
     // The player and its settings
     player = this.physics.add.sprite(100, 450, 'dude');
-
-    //  Player physics properties. Give the little guy a slight bounce.
-    player.setBounce(0);
-    player.setCollideWorldBounds(true);
 
     //  Our player animations, turning, walking left and walking right.
     this.anims.create({
@@ -115,20 +110,9 @@ function update() {
         return;
     }
 
-
     if (!digging) {
         if (cursors.down.isDown) {
-            player.setVelocityX(0);
-            digging = true;
-            player.body.enable = false;
-            player.anims.play('digging_start', true);
-            setTimeout(() => {
-                player.anims.play('digging_end', true);
-                setTimeout(() => {
-                    digging = false;
-                    player.body.enable = true;
-                }, 400);
-            }, 1000);
+            dig(player);
         }
         else if (cursors.left.isDown) {
             player.setVelocityX(-240);
@@ -161,6 +145,20 @@ function update() {
     }
 }
 
+function dig(player) {
+    player.setVelocityX(0);
+    digging = true;
+    player.body.enable = false;
+    player.anims.play('digging_start', true);
+    setTimeout(() => {
+        player.anims.play('digging_end', true);
+        setTimeout(() => {
+            digging = false;
+            player.body.enable = true;
+        }, 400);
+    }, 1000);
+}
+
 function collectDrug(player, drug) {
     drug.destroy();
 
@@ -174,7 +172,8 @@ function drugHit(drug, platform) {
 
 function addDrug() {
     const x = Math.floor(Math.random() * 800);
-    let drug = drugs.create(x, 0, 'drug');
+    let drug = drugs.create(x, 0, 'drug').setScale(0.5);
     drug.setVelocity(0, 80);
+    drug.setAngularVelocity(Math.random() * 500 - 250);
     drug.body.setAllowGravity(false);
 }
