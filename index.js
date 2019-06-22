@@ -24,6 +24,7 @@ var cursors;
 var score = 0;
 var gameOver = false;
 var scoreText;
+var turn_left = false;
 
 var game = new Phaser.Game(config);
 
@@ -32,7 +33,7 @@ function preload() {
     this.load.image('ground', 'assets/platform.png');
     this.load.image('star', 'assets/star.png');
     this.load.image('drug', 'assets/bomb.png');
-    this.load.spritesheet('dude', 'assets/dude.png', { frameWidth: 32, frameHeight: 48 });
+    this.load.spritesheet('dude', 'assets/SoirMole.png', { frameWidth: 38, frameHeight: 25 });
 }
 
 function create() {
@@ -62,16 +63,22 @@ function create() {
     });
 
     this.anims.create({
-        key: 'turn',
-        frames: [{ key: 'dude', frame: 4 }],
+        key: 'right',
+        frames: this.anims.generateFrameNumbers('dude', { start: 4, end: 7 }),
+        frameRate: 10,
+        repeat: -1
+    });
+
+    this.anims.create({
+        key: 'turn_left',
+        frames: [{ key: 'dude', frame: 0 }],
         frameRate: 20
     });
 
     this.anims.create({
-        key: 'right',
-        frames: this.anims.generateFrameNumbers('dude', { start: 5, end: 8 }),
-        frameRate: 10,
-        repeat: -1
+        key: 'turn_right',
+        frames: [{ key: 'dude', frame: 4 }],
+        frameRate: 20
     });
 
     //  Input Events
@@ -90,7 +97,7 @@ function create() {
     this.physics.add.collider(stars, platforms);
 
     //  Checks to see if the player overlaps with any of the stars, if he does call the collectStar function
-    this.physics.add.overlap(player, stars, collectStar, null, this);
+    this.physics.add.overlap(player, drugs, collectDrug, null, this);
 
     this.physics.add.collider(drugs, platforms, drugHit, null, this);
 }
@@ -101,19 +108,25 @@ function update() {
     }
 
     if (cursors.left.isDown) {
-        player.setVelocityX(-160);
+        player.setVelocityX(-240);
+        turn_left = true;
 
         player.anims.play('left', true);
     }
     else if (cursors.right.isDown) {
-        player.setVelocityX(160);
+        player.setVelocityX(240);
+        turn_left = false;
 
         player.anims.play('right', true);
     }
     else {
         player.setVelocityX(0);
 
-        player.anims.play('turn');
+        if (turn_left) {
+            player.anims.play('turn_left');
+        } else {
+            player.anims.play('turn_right');
+        }
     }
 
     if (cursors.up.isDown && player.body.touching.down) {
@@ -125,30 +138,12 @@ function update() {
     }
 }
 
-function collectStar(player, star) {
-    star.disableBody(true, true);
+function collectDrug(player, drug) {
+    drug.disableBody(true, true);
 
     //  Add and update the score
     score += 10;
     scoreText.setText('Score: ' + score);
-
-    if (stars.countActive(true) === 0) {
-        //  A new batch of stars to collect
-        stars.children.iterate(function (child) {
-
-            child.enableBody(true, child.x, 0, true, true);
-
-        });
-
-        var x = (player.x < 400) ? Phaser.Math.Between(400, 800) : Phaser.Math.Between(0, 400);
-
-        var bomb = drugs.create(x, 16, 'bomb');
-        bomb.setBounce(1);
-        bomb.setCollideWorldBounds(true);
-        bomb.setVelocity(Phaser.Math.Between(-200, 200), 20);
-        bomb.allowGravity = false;
-
-    }
 }
 
 function drugHit(drug, platform) {
@@ -160,5 +155,4 @@ function addDrug() {
     const x = Math.floor(Math.random() * 800);
     let drug = drugs.create(x, 0, 'drug');
     drug.setVelocity(0, 20);
-    drug.allowGravity = false;
 }
