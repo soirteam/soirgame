@@ -72,6 +72,7 @@ var LSDPipeline = new Phaser.Class({
     }
 });
 
+const defaultAmbientColor = 0x666666;
 const config = {
     type: Phaser.AUTO,
     width: 800,
@@ -114,7 +115,7 @@ const specialDrugsList = [
             player.speed += 120;
             setTimeout(() => {
                 player.speed -= 120;
-                lights.setAmbientColor(0x999999);
+                lights.setAmbientColor(defaultAmbientColor);
             }, 10000);
             lights.setAmbientColor(0x0066cc);
             console.log("MDMA taken");
@@ -125,9 +126,13 @@ const specialDrugsList = [
         sprite: 'lsd',
         effect: function() {
             console.log("LSD taken");
+            player.effect = 'lsd';
 
+            player.body.setAllowGravity(false);
             this.backgroundlayer.setPipeline("lsd");
             setTimeout(() => {
+                player.effect = undefined;
+                player.body.setAllowGravity(true);
                 this.backgroundlayer.resetPipeline();
             }, 8000);
         },
@@ -141,7 +146,7 @@ const specialDrugsList = [
             setTimeout(() => {
                 player.effect = undefined;
                 player.speed += 100
-                lights.setAmbientColor(0x999999);
+                lights.setAmbientColor(defaultAmbientColor);
             }, 10000)
             lights.setAmbientColor(0x33ff99);
 
@@ -345,7 +350,13 @@ function update() {
     }
 
     if (!digging && player.body) {
-        if (cursors.down.isDown && player.body.blocked.down) {
+        if (player.effect === 'lsd' && cursors.down.isDown) {
+            player.setVelocityY(player.speed);
+        }
+        else if (player.effect === 'lsd' && cursors.up.isDown) {
+            player.setVelocityY(-player.speed);
+        }
+        else if (cursors.down.isDown && player.body.blocked.down) {
             dig(player);
         }
         else if (cursors.left.isDown) {
@@ -361,6 +372,9 @@ function update() {
             player.anims.play('right', true);
         }
         else {
+            if (player.effect === 'lsd') {
+                player.setVelocityY(0);
+            }
             player.setVelocityX(0);
 
             if (turn_left) {
@@ -369,7 +383,7 @@ function update() {
                 player.anims.play('turn_right');
             }
         }
-        if (cursors.up.isDown && player.body.blocked.down) {
+         if (cursors.up.isDown && player.body.blocked.down) {
             player.setVelocityY(-330);
         }
     }
