@@ -116,11 +116,13 @@ const specialDrugsList = [
     {
         sprite: 'cocain',
         effect: () => {
+            player.effect = "cocain";
             player.speed += 100;
             setTimeout(() => {
                 player.speed -= 100;
                 lights.setAmbientColor(0x999999);
-            }, 3000)
+                player.effect = "";
+            }, 5000)
             lights.setAmbientColor(0xe6f2ff);
             player.setVelocityY(-650);
             console.log("COCAïN taken");
@@ -333,8 +335,12 @@ function update() {
                 player.anims.play('turn_right');
             }
         }
-         if (cursors.up.isDown && player.body.blocked.down) {
-            player.setVelocityY(-330);
+        if (cursors.up.isDown && player.body.blocked.down) {
+            var jump = -330;
+            if (player.effect === "cocain") {
+                jump -= 200;
+            }
+            player.setVelocityY(jump);
         }
     }
 
