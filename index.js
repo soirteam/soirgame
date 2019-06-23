@@ -20,17 +20,17 @@ const specialDrugsList = [
     {
         sprite: 'mdma',
         effect: () => console.log("MDMA taken"),
-        score: 100,
+        score: 30,
     },
     {
         sprite: 'lsd',
         effect: () => console.log("LSD taken"),
-        score: 100,
+        score: 40,
     },
     {
         sprite: 'cannabis',
         effect: () => console.log("CANNABIS taken"),
-        score: 100,
+        score: 20,
     },
     {
         sprite: 'cactus',
@@ -89,6 +89,9 @@ function create() {
     // The player and its settings
     player = this.physics.add.sprite(100, 450, 'dude');
 
+    player.setCollideWorldBounds(true);
+    player.onWorldBounds = true;
+
     //  Our player animations, turning, walking left and walking right.
     this.anims.create({
         key: 'left',
@@ -113,6 +116,12 @@ function create() {
     this.anims.create({
         key: 'turn_right',
         frames: [{ key: 'dude', frame: 4 }],
+        frameRate: 20
+    });
+
+    this.anims.create({
+        key: 'ded',
+        frames: [{ key: 'dude', frame: 12 }],
         frameRate: 20
     });
 
@@ -158,6 +167,8 @@ function create() {
 
 function update() {
     if (gameOver) {
+        player.anims.play('ded');
+        player.setVelocityX(0);
         if (cursors.space.isDown) {
             gameOver = false
             score = 0
@@ -220,6 +231,9 @@ function dig(player) {
 }
 
 function collectDrug(player, drug) {
+    if (gameOver) {
+        return;
+    }
     if (drug.type.effect) {
         drug.type.effect(player);
     }
@@ -244,13 +258,12 @@ function addDrug() {
 }
 
 function shootLaser() {
-    setTimeout(function(){ laser.body.enable = true }, 1000);
-    setTimeout(function(){ laser.body.enable = false }, 2000);
+    setTimeout(function () { laser.body.enable = true }, 1000);
+    setTimeout(function () { laser.body.enable = false }, 2000);
     laser.anims.play('laser_shot', false);
 }
 
 function endGame() {
-    player.body.enable = false;
     this.add.text(240, 200, 'GAME OVER', { fontSize: '60px', fill: '#fff' });
     gameOver = true
 }
