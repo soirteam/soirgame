@@ -395,7 +395,7 @@ function destroy2(_, elem) {
 }
 
 function addDrug() {
-    const type = Math.floor(Math.random() * 1) === 0 ? specialDrugsList[Math.floor(Math.random() * specialDrugsList.length)] : default_drug;
+    const type = Math.floor(Math.random() * 20) === 0 ? specialDrugsList[Math.floor(Math.random() * specialDrugsList.length)] : default_drug;
     const x = Math.floor(Math.random() * 800);
     let drug = drugs.create(x, 0, type.sprite).setScale(0.5);
     if (new_drugs_apply_effect_with_this_very_long_variable) {
