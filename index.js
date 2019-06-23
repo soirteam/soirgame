@@ -29,7 +29,6 @@ var scoreText;
 var turn_left = false;
 var digging = false;
 var lights;
-var lights_effects;
 
 var game = new Phaser.Game(config);
 
@@ -47,8 +46,10 @@ const specialDrugsList = [
     {
         sprite: 'cannabis',
         effect: () => {
+			player.effect = 'cannabis';
             player.speed -= 100;
             setTimeout(() => {
+				player.effect = undefined;
                 player.speed += 100
                 lights.setAmbientColor(0x999999);
             }, 5000)
@@ -78,7 +79,6 @@ const default_drug = {
 function preload() {
     this.load.image("tiles", "assets/platformertiles.png");
     this.load.tilemapTiledJSON("map", "assets/soir_platform.json");
-    this.load.image('mdma', 'assets/redbull.png');
     this.load.image('lsd', 'assets/lsd.png');
     this.load.image('cannabis', 'assets/cannabis.png');
     this.load.image('mdma', 'assets/redbull.png');
@@ -152,7 +152,6 @@ function create() {
         frameRate: 10,
     });
 
-
     this.anims.create({
         key: 'digging_end',
         frames: this.anims.generateFrameNumbers('dude', { start: 8, end: 11 }),
@@ -180,7 +179,6 @@ function create() {
     })
 
     //  Input Events
-
     cursors = this.input.keyboard.createCursorKeys();
     polices = this.physics.add.group();
     drugs = this.physics.add.group();
@@ -247,14 +245,18 @@ function update() {
         shootLaser();
     }
 
+    if (polices.children.entries.length < 2 && Math.floor(Math.random() * 30) === 0) {
+        addPolice();
+    }
+
     if (Math.floor(Math.random() * 30) === 0) {
-        if (police_number < 2)
-            addPolice();
         addDrug();
     }
 }
 
 function dig(player) {
+	const time_underground = (player.effect === 'cannabis') ? 2000 : 1000;
+
     player.setVelocityX(0);
     digging = true;
     player.body.enable = false;
@@ -265,7 +267,7 @@ function dig(player) {
             digging = false;
             player.body.enable = true;
         }, 400);
-    }, 1000);
+    }, time_underground);
 }
 
 function collectDrug(player, drug) {
@@ -308,13 +310,9 @@ function addPolice() {
     let police = polices.create(width, 525, 'police');
     police.setCollideWorldBounds(true);
     police.body.onWorldBounds = true;
-    police.body.world.on('worldbounds', function (body) {
-        police.destroy();
-        police_number--;
-    })
+    police.body.world.on('worldbounds', () => police.destroy())
     police.anims.play(animation, true);
     police.setVelocity(velocity, 0);
-    police_number++;
 }
 
 function shootLaser() {
