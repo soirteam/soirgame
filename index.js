@@ -1,5 +1,6 @@
 import {DistortPipeline, LSDPipeline, AmanitePipeline} from "./shaders.js"
 
+const defaultAmbientColor = 0x666666;
 const config = {
     type: Phaser.AUTO,
     width: 800,
@@ -43,7 +44,7 @@ const specialDrugsList = [
             player.speed += 120;
             setTimeout(() => {
                 player.speed -= 120;
-                lights.setAmbientColor(0x999999);
+                lights.setAmbientColor(defaultAmbientColor);
             }, 10000);
             lights.setAmbientColor(0x0066cc);
             console.log("MDMA taken");
@@ -54,9 +55,13 @@ const specialDrugsList = [
         sprite: 'lsd',
         effect: function() {
             console.log("LSD taken");
+            player.effect = 'lsd';
 
+            player.body.setAllowGravity(false);
             this.backgroundlayer.setPipeline("lsd");
             setTimeout(() => {
+                player.effect = undefined;
+                player.body.setAllowGravity(true);
                 this.backgroundlayer.resetPipeline();
             }, 8000);
         },
@@ -70,7 +75,7 @@ const specialDrugsList = [
             setTimeout(() => {
                 player.effect = undefined;
                 player.speed += 100
-                lights.setAmbientColor(0x999999);
+                lights.setAmbientColor(defaultAmbientColor);
             }, 10000)
             lights.setAmbientColor(0x33ff99);
 
@@ -80,8 +85,11 @@ const specialDrugsList = [
     },
     {
         sprite: 'cactus',
-        effect: () => {
-            // this.add.image(800, 600, 'god');
+        effect: function() {
+            const godImg = this.add.image(0, 0, 'god').setOrigin(0, 0);
+            setTimeout(() => {
+                godImg.destroy();
+            }, 8000)
         },
         score: 120,
     },
@@ -119,6 +127,15 @@ const specialDrugsList = [
         },
         score: 60,
     },
+    {
+        sprite: 'champignon',
+        effect: () => {
+            setTimeout(() => {
+            }, 3000)
+            console.log("CHAMPIGNON MAGIC taken");
+        },
+        score: 70,
+    },
 ];
 
 const default_drug = {
@@ -136,6 +153,7 @@ function preload() {
     this.load.image('amanite', 'assets/amanite.png');
     this.load.image('cactus', 'assets/cactus.png');
     this.load.image('cocain', 'assets/cocain.png');
+    this.load.image('champignon', 'assets/champignon.png');
     this.load.image('default_pill', 'assets/default_pill.png');
     this.load.image('god', 'assets/god.png');
     this.load.spritesheet('laser', 'assets/lasoir.png', { frameWidth: 800, frameHeight: 200 });
@@ -272,15 +290,19 @@ function update() {
         player.anims.play('ded');
         player.setVelocityX(0);
         if (cursors.space.isDown) {
-            gameOver = false
-            score = 0
-            this.scene.restart();
+            location.reload();
         }
         return;
     }
 
     if (!digging && player.body) {
-        if (cursors.down.isDown && player.body.blocked.down) {
+        if (player.effect === 'lsd' && cursors.down.isDown) {
+            player.setVelocityY(player.speed);
+        }
+        else if (player.effect === 'lsd' && cursors.up.isDown) {
+            player.setVelocityY(-player.speed);
+        }
+        else if (cursors.down.isDown && player.body.blocked.down) {
             dig(player);
         }
         else if (cursors.left.isDown) {
@@ -296,6 +318,9 @@ function update() {
             player.anims.play('right', true);
         }
         else {
+            if (player.effect === 'lsd') {
+                player.setVelocityY(0);
+            }
             player.setVelocityX(0);
 
             if (turn_left) {
@@ -304,7 +329,7 @@ function update() {
                 player.anims.play('turn_right');
             }
         }
-        if (cursors.up.isDown && player.body.blocked.down) {
+         if (cursors.up.isDown && player.body.blocked.down) {
             player.setVelocityY(-330);
         }
     }
