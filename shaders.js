@@ -23,10 +23,10 @@ export var DistortPipeline = new Phaser.Class({
     }
 });
 
-export var AmanitePipeline = new Phaser.Class({
+export var ChampignonPipeline = new Phaser.Class({
     Extends: Phaser.Renderer.WebGL.Pipelines.TextureTintPipeline,
     initialize:
-    function AmanitePipeline (game)
+    function ChampignonPipeline (game)
     {
         Phaser.Renderer.WebGL.Pipelines.TextureTintPipeline.call(this, {
             game: game,

@@ -1,4 +1,4 @@
-import {DistortPipeline, LSDPipeline, AmanitePipeline} from "./shaders.js"
+import {DistortPipeline, LSDPipeline, ChampignonPipeline} from "./shaders.js"
 
 const defaultAmbientColor = 0x666666;
 const config = {
@@ -129,9 +129,11 @@ const specialDrugsList = [
     },
     {
         sprite: 'champignon',
-        effect: () => {
+        effect: function() {
+            this.backgroundlayer.setPipeline("champignon");
             setTimeout(() => {
-            }, 3000)
+                this.backgroundlayer.resetPipeline();
+            }, 8000)
             console.log("CHAMPIGNON MAGIC taken");
         },
         score: 70,
@@ -167,8 +169,8 @@ function preload() {
     this.distortPipeline = game.renderer.addPipeline('distort', new DistortPipeline(game));
     this.distortPipeline.setFloat2('resolution', game.config.width, game.config.height);
 
-    this.amanitePipeline = game.renderer.addPipeline('amanite', new AmanitePipeline(game));
-    this.amanitePipeline.setFloat2('uResolution', game.config.width, game.config.height);
+    this.champignonPipeline = game.renderer.addPipeline('champignon', new ChampignonPipeline(game));
+    this.champignonPipeline.setFloat2('uResolution', game.config.width, game.config.height);
 }
 
 function create() {
@@ -283,7 +285,7 @@ function create() {
 function update() {
     this.lsdPipeline.setFloat1("time", time);
     this.distortPipeline.setFloat1("time", time);
-    this.amanitePipeline.setFloat1("uTime", time);
+    this.champignonPipeline.setFloat1("uTime", time);
     time += 0.05;
 
     if (gameOver) {
@@ -385,8 +387,7 @@ function destroy2(_, elem) {
 }
 
 function addDrug() {
-    // const type = Math.floor(Math.random() * 20) === 0 ? specialDrugsList[Math.floor(Math.random() * specialDrugsList.length)] : default_drug;
-    const type = Math.floor(Math.random() * 1) === 0 ? specialDrugsList[Math.floor(Math.random() * specialDrugsList.length)] : default_drug;
+    const type = Math.floor(Math.random() * 20) === 0 ? specialDrugsList[Math.floor(Math.random() * specialDrugsList.length)] : default_drug;
     const x = Math.floor(Math.random() * 800);
     let drug = drugs.create(x, 0, type.sprite).setScale(0.5);
     if (new_drugs_apply_effect_with_this_very_long_variable) {
