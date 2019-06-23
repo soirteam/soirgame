@@ -348,7 +348,7 @@ function update() {
         return;
     }
 
-    if (!digging) {
+    if (!digging && player.body) {
         if (cursors.down.isDown && player.body.blocked.down) {
             dig(player);
         }
