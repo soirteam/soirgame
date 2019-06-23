@@ -94,6 +94,7 @@ var player;
 var polices;
 var police_number = 0;
 var drugs;
+var new_drugs_apply_effect_with_this_very_long_variable = false;
 var laser;
 var platforms;
 var cursors;
@@ -164,11 +165,13 @@ const specialDrugsList = [
             drugs.children.entries.forEach((drug) => {
                 drug.setPipeline("distort");
             });
+            new_drugs_apply_effect_with_this_very_long_variable = true;
             setTimeout(() => {
+                player.resetPipeline();
                 drugs.children.entries.forEach((drug) => {
                     drug.resetPipeline();
                 });
-                player.resetPipeline();
+                new_drugs_apply_effect_with_this_very_long_variable = false;
             }, 8000);
         },
         score: -50,
@@ -432,6 +435,9 @@ function addDrug() {
     const type = Math.floor(Math.random() * 20) === 0 ? specialDrugsList[Math.floor(Math.random() * specialDrugsList.length)] : default_drug;
     const x = Math.floor(Math.random() * 800);
     let drug = drugs.create(x, 0, type.sprite).setScale(0.5);
+    if (new_drugs_apply_effect_with_this_very_long_variable) {
+        drug.setPipeline("distort");
+    }
     drug.setVelocity(0, 80);
     drug.type = type;
     drug.setAngularVelocity(Math.random() * 500 - 250);
