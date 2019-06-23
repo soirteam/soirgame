@@ -109,7 +109,15 @@ var game = new Phaser.Game(config);
 const specialDrugsList = [
     {
         sprite: 'mdma',
-        effect: () => console.log("MDMA taken"),
+        effect: () => {
+            player.speed += 120;
+            setTimeout(() => {
+                player.speed -= 120;
+                lights.setAmbientColor(0x999999);
+            }, 10000);
+            lights.setAmbientColor(0x0066cc);
+            console.log("MDMA taken");
+        },
         score: 30,
     },
     {
@@ -119,7 +127,6 @@ const specialDrugsList = [
 
             this.backgroundlayer.setPipeline("lsd");
             setTimeout(() => {
-                console.log("TIMEDOUUUUUUTLSD")
                 this.backgroundlayer.resetPipeline();
             }, 8000);
         },
@@ -136,13 +143,16 @@ const specialDrugsList = [
                 lights.setAmbientColor(0x999999);
             }, 10000)
             lights.setAmbientColor(0x33ff99);
+
             console.log("CANNABIS taken");
         },
         score: 20,
     },
     {
         sprite: 'cactus',
-        effect: () => console.log("CACTUS SAN PEDRO taken"),
+        effect: () => {
+            // this.add.image(800, 600, 'god');
+        },
         score: 120,
     },
     {
@@ -151,11 +161,31 @@ const specialDrugsList = [
             console.log("AMANITE TUE MOUCHE taken")
 
             player.setPipeline("distort");
+            drugs.children.entries.forEach((drug) => {
+                drug.setPipeline("distort");
+            });
             setTimeout(() => {
+                drugs.children.entries.forEach((drug) => {
+                    drug.resetPipeline();
+                });
                 player.resetPipeline();
             }, 8000);
         },
         score: -50,
+    },
+    {
+        sprite: 'cocain',
+        effect: () => {
+            player.speed += 100;
+            setTimeout(() => {
+                player.speed -= 100;
+                lights.setAmbientColor(0x999999);
+            }, 3000)
+            lights.setAmbientColor(0xe6f2ff);
+            player.setVelocityY(-450);
+            console.log("COCAïN taken");
+        },
+        score: 60,
     },
 ];
 
@@ -173,7 +203,9 @@ function preload() {
     this.load.image('mdma', 'assets/redbull.png');
     this.load.image('amanite', 'assets/amanite.png');
     this.load.image('cactus', 'assets/cactus.png');
+    this.load.image('cocain', 'assets/cocain.png');
     this.load.image('default_pill', 'assets/default_pill.png');
+    this.load.image('god', 'assets/god.png');
     this.load.spritesheet('laser', 'assets/lasoir.png', { frameWidth: 800, frameHeight: 200 });
     this.load.spritesheet('dude', 'assets/SoirMole.png', { frameWidth: 38, frameHeight: 25 });
 
@@ -397,9 +429,9 @@ function destroy2(_, elem) {
 }
 
 function addDrug() {
-    const type = Math.floor(Math.random() * 1) === 0 ? specialDrugsList[Math.floor(Math.random() * specialDrugsList.length)] : default_drug;
+    const type = Math.floor(Math.random() * 20) === 0 ? specialDrugsList[Math.floor(Math.random() * specialDrugsList.length)] : default_drug;
     const x = Math.floor(Math.random() * 800);
-    let drug = drugs.create(x, 0, type.sprite).setScale(0.5).setPipeline("distort");
+    let drug = drugs.create(x, 0, type.sprite).setScale(0.5);
     drug.setVelocity(0, 80);
     drug.type = type;
     drug.setAngularVelocity(Math.random() * 500 - 250);
