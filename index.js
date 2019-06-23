@@ -302,14 +302,14 @@ function update() {
     }
 
     if (!digging && player.body) {
-        if (player.effect === 'lsd' && cursors.down.isDown) {
-            player.setVelocityY(player.speed);
-        }
-        else if (player.effect === 'lsd' && cursors.up.isDown) {
+        if (player.effect === 'lsd' && cursors.up.isDown) {
             player.setVelocityY(-player.speed);
         }
         else if (cursors.down.isDown && player.body.blocked.down) {
             dig(player);
+        }
+		if (cursors.down.isDown) {
+            player.setVelocityY(player.speed);
         }
         else if (cursors.left.isDown) {
             player.setVelocityX(-player.speed);
