@@ -424,6 +424,7 @@ function addPolice() {
     police.body.world.on('worldbounds', () => police.destroy())
     police.anims.play(animation, true);
     police.setVelocity(velocity, 0);
+    police.setSize(32, 20).setOffset(0, 5);
 }
 
 function shootLaser() {
