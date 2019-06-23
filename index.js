@@ -215,11 +215,6 @@ function preload() {
     this.load.spritesheet('laser', 'assets/lasoir.png', { frameWidth: 800, frameHeight: 200 });
     this.load.spritesheet('dude', 'assets/SoirMole.png', { frameWidth: 38, frameHeight: 25 });
 
-    this.load.image('beball', 'assets/sprites/beball1.png');
-    this.load.image('atari', 'assets/sprites/atari400.png');
-    this.load.image('bikkuriman', 'assets/sprites/bikkuriman.png');
-    this.load.image('bunny', 'assets/sprites/bunny.png');
-
     this.load.spritesheet('police', 'assets/Policemole.png', { frameWidth: 38, frameHeight: 25 });
 
     this.lsdPipeline = game.renderer.addPipeline('lsd', new LSDPipeline(game));
@@ -248,8 +243,8 @@ function create() {
 
     player.speed = 240;
 
-    this.lights.enable().setAmbientColor(0x999999);
-    this.lights.addLight(400, 300, 300).setIntensity(1);
+    this.lights.enable().setAmbientColor(0x666666);
+    this.lights.addLight(-100, 100, 1000).setIntensity(2);
 
     //  Our player animations, turning, walking left and walking right.
     this.anims.create({
@@ -347,14 +342,12 @@ function update() {
         player.anims.play('ded');
         player.setVelocityX(0);
         if (cursors.space.isDown) {
-            gameOver = false
-            score = 0
-            this.scene.restart();
+            location.reload();
         }
         return;
     }
 
-    if (!digging) {
+    if (!digging && player.body) {
         if (cursors.down.isDown && player.body.blocked.down) {
             dig(player);
         }
