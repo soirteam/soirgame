@@ -109,8 +109,8 @@ function create() {
 
     player.speed = 240;
 
-    this.lights.enable().setAmbientColor(0x999999);
-    this.lights.addLight(400, 300, 300).setIntensity(1);
+    this.lights.enable().setAmbientColor(0x666666);
+    this.lights.addLight(-100, 100, 1000).setIntensity(2);
 
     //  Our player animations, turning, walking left and walking right.
     this.anims.create({
