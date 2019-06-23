@@ -16,6 +16,21 @@ const config = {
     }
 };
 
+var player;
+var drugs;
+var laser;
+var platforms;
+var cursors;
+var score = 0;
+var gameOver = false;
+var scoreText;
+var turn_left = false;
+var digging = false;
+var lights;
+var lights_effects;
+
+var game = new Phaser.Game(config);
+
 const specialDrugsList = [
     {
         sprite: 'mdma',
@@ -29,7 +44,15 @@ const specialDrugsList = [
     },
     {
         sprite: 'cannabis',
-        effect: () => console.log("CANNABIS taken"),
+        effect: () => {
+            player.speed -= 100;
+            setTimeout(() => {
+                player.speed += 100
+                lights.setAmbientColor(0x999999);
+            }, 5000)
+            lights.setAmbientColor(0x33ff99);
+            console.log("CANNABIS taken");
+        },
         score: 20,
     },
     {
@@ -50,19 +73,6 @@ const default_drug = {
     score: 5,
 };
 
-var player;
-var drugs;
-var laser;
-var platforms;
-var cursors;
-var score = 0;
-var gameOver = false;
-var scoreText;
-var turn_left = false;
-var digging = false;
-
-var game = new Phaser.Game(config);
-
 function preload() {
     this.load.image("tiles", "assets/platformertiles.png");
     this.load.tilemapTiledJSON("map", "assets/soir_platform.json");
@@ -78,10 +88,11 @@ function preload() {
 }
 
 function create() {
+    lights = this.lights;
     this.map = this.add.tilemap("map");
     var tileset = this.map.addTilesetImage("platformertiles", "tiles");
-    this.backgroundlayer = this.map.createStaticLayer("Background", tileset);
-    this.groundLayer = this.map.createStaticLayer("Ground", tileset);
+    this.backgroundlayer = this.map.createStaticLayer("Background", tileset).setPipeline("Light2D");;
+    this.groundLayer = this.map.createStaticLayer("Ground", tileset).setPipeline("Light2D");;
 
     //Before you can use the collide function you need to set what tiles can collide
     this.groundLayer.setCollisionBetween(0, 800);
@@ -91,6 +102,12 @@ function create() {
 
     player.setCollideWorldBounds(true);
     player.onWorldBounds = true;
+
+    player.speed = 240;
+
+    this.lights.enable().setAmbientColor(0x999999);
+    this.lights.addLight(400, 300, 300).setIntensity(1);
+    console.log(this.lights.getMaxVisibleLights());
 
     //  Our player animations, turning, walking left and walking right.
     this.anims.create({
@@ -182,13 +199,13 @@ function update() {
             dig(player);
         }
         else if (cursors.left.isDown) {
-            player.setVelocityX(-240);
+            player.setVelocityX(-player.speed);
             turn_left = true;
 
             player.anims.play('left', true);
         }
         else if (cursors.right.isDown) {
-            player.setVelocityX(240);
+            player.setVelocityX(player.speed);
             turn_left = false;
 
             player.anims.play('right', true);
