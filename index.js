@@ -1,3 +1,77 @@
+var time = 0;
+
+var DistortPipeline = new Phaser.Class({
+    Extends: Phaser.Renderer.WebGL.Pipelines.TextureTintPipeline,
+    initialize:
+    function DistortPipeline (game)
+    {
+        Phaser.Renderer.WebGL.Pipelines.TextureTintPipeline.call(this, {
+            game: game,
+            renderer: game.renderer,
+            fragShader: `
+            precision mediump float;
+            uniform float     time;
+            uniform vec2      resolution;
+            uniform sampler2D uMainSampler;
+            varying vec2 outTexCoord;
+            void main( void ) {
+                vec2 uv = outTexCoord;
+                // uv.y *= -1.0;
+                uv.y += (sin((uv.x + (time * 0.5)) * 10.0) * 0.1) + (sin((uv.x + (time * 0.2)) * 32.0) * 0.01);
+                vec4 texColor = texture2D(uMainSampler, uv);
+                gl_FragColor = texColor;
+            }`
+        });
+    }
+});
+
+var LSDPipeline = new Phaser.Class({
+    Extends: Phaser.Renderer.WebGL.Pipelines.TextureTintPipeline,
+    initialize:
+    function LSDPipeline (game)
+    {
+        Phaser.Renderer.WebGL.Pipelines.TextureTintPipeline.call(this, {
+            game: game,
+            renderer: game.renderer,
+            fragShader: `
+            precision mediump float;
+
+            uniform sampler2D uMainSampler;
+            uniform vec2 uResolution;
+            uniform float uTime;
+
+            varying vec2 outTexCoord;
+            varying vec4 outTint;
+
+            vec4 plasma()
+            {
+                // vec2 pixelPos = gl_FragCoord.xy / uResolution * 15.0;
+                vec2 pixelPos = gl_FragCoord.xy / uResolution * 20.0;
+                float freq = 0.8;
+                float value =
+                    sin(uTime + pixelPos.x * freq) +
+                    sin(uTime + pixelPos.y * freq) +
+                    sin(uTime + (pixelPos.x + pixelPos.y) * freq) +
+                    cos(uTime + sqrt(length(pixelPos - 0.5)) * freq * 2.0);
+
+                return vec4(
+                    cos(value),
+                    sin(value),
+                    sin(value * 3.14 * 2.0),
+                    cos(value)
+                );
+            }
+            void main() 
+            {
+                vec4 texel = texture2D(uMainSampler, outTexCoord);
+                texel *= vec4(outTint.rgb * outTint.a, outTint.a);
+                gl_FragColor = texel * plasma();
+            }
+            `
+        });
+    }
+});
+
 const config = {
     type: Phaser.AUTO,
     width: 800,
@@ -40,16 +114,24 @@ const specialDrugsList = [
     },
     {
         sprite: 'lsd',
-        effect: () => console.log("LSD taken"),
+        effect: function() {
+            console.log("LSD taken");
+
+            this.backgroundlayer.setPipeline("lsd");
+            setTimeout(() => {
+                console.log("TIMEDOUUUUUUTLSD")
+                this.backgroundlayer.resetPipeline();
+            }, 8000);
+        },
         score: 40,
     },
     {
         sprite: 'cannabis',
         effect: () => {
-			player.effect = 'cannabis';
+            player.effect = 'cannabis';
             player.speed -= 100;
             setTimeout(() => {
-				player.effect = undefined;
+                player.effect = undefined;
                 player.speed += 100
                 lights.setAmbientColor(0x999999);
             }, 10000)
@@ -65,7 +147,14 @@ const specialDrugsList = [
     },
     {
         sprite: 'amanite',
-        effect: () => console.log("AMANITE TUE MOUCHE taken"),
+        effect: function() {
+            console.log("AMANITE TUE MOUCHE taken")
+
+            player.setPipeline("distort");
+            setTimeout(() => {
+                player.resetPipeline();
+            }, 8000);
+        },
         score: -50,
     },
 ];
@@ -87,7 +176,19 @@ function preload() {
     this.load.image('default_pill', 'assets/default_pill.png');
     this.load.spritesheet('laser', 'assets/lasoir.png', { frameWidth: 800, frameHeight: 200 });
     this.load.spritesheet('dude', 'assets/SoirMole.png', { frameWidth: 38, frameHeight: 25 });
+
+    this.load.image('beball', 'assets/sprites/beball1.png');
+    this.load.image('atari', 'assets/sprites/atari400.png');
+    this.load.image('bikkuriman', 'assets/sprites/bikkuriman.png');
+    this.load.image('bunny', 'assets/sprites/bunny.png');
+
     this.load.spritesheet('police', 'assets/Policemole.png', { frameWidth: 38, frameHeight: 25 });
+
+    this.lsdPipeline = game.renderer.addPipeline('lsd', new LSDPipeline(game));
+    this.lsdPipeline.setFloat2('uResolution', game.config.width, game.config.height);
+
+    this.distortPipeline = game.renderer.addPipeline('distort', new DistortPipeline(game));
+    this.distortPipeline.setFloat2('resolution', game.config.width, game.config.height);
 }
 
 function create() {
@@ -200,6 +301,10 @@ function create() {
 }
 
 function update() {
+    this.lsdPipeline.setFloat1("uTime", time);
+    this.distortPipeline.setFloat1("time", time);
+    time += 0.1;
+
     if (gameOver) {
         player.anims.play('ded');
         player.setVelocityX(0);
@@ -255,7 +360,7 @@ function update() {
 }
 
 function dig(player) {
-	const time_underground = (player.effect === 'cannabis') ? 4000 : 1000;
+    const time_underground = (player.effect === 'cannabis') ? 4000 : 1000;
 
     player.setVelocityX(0);
     digging = true;
@@ -275,7 +380,7 @@ function collectDrug(player, drug) {
         return;
     }
     if (drug.type.effect) {
-        drug.type.effect(player);
+        drug.type.effect.bind(this)(player);
     }
     drug.destroy();
 
@@ -292,9 +397,9 @@ function destroy2(_, elem) {
 }
 
 function addDrug() {
-    const type = Math.floor(Math.random() * 20) === 0 ? specialDrugsList[Math.floor(Math.random() * specialDrugsList.length)] : default_drug;
+    const type = Math.floor(Math.random() * 1) === 0 ? specialDrugsList[Math.floor(Math.random() * specialDrugsList.length)] : default_drug;
     const x = Math.floor(Math.random() * 800);
-    let drug = drugs.create(x, 0, type.sprite).setScale(0.5);
+    let drug = drugs.create(x, 0, type.sprite).setScale(0.5).setPipeline("distort");
     drug.setVelocity(0, 80);
     drug.type = type;
     drug.setAngularVelocity(Math.random() * 500 - 250);
