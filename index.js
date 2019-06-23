@@ -193,6 +193,15 @@ const specialDrugsList = [
         },
         score: 60,
     },
+    {
+        sprite: 'champignon',
+        effect: () => {
+            setTimeout(() => {
+            }, 3000)
+            console.log("CHAMPIGNON MAGIC taken");
+        },
+        score: 70,
+    },
 ];
 
 const default_drug = {
@@ -210,6 +219,7 @@ function preload() {
     this.load.image('amanite', 'assets/amanite.png');
     this.load.image('cactus', 'assets/cactus.png');
     this.load.image('cocain', 'assets/cocain.png');
+    this.load.image('champignon', 'assets/champignon.png');
     this.load.image('default_pill', 'assets/default_pill.png');
     this.load.image('god', 'assets/god.png');
     this.load.spritesheet('laser', 'assets/lasoir.png', { frameWidth: 800, frameHeight: 200 });
