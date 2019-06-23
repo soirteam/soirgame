@@ -212,11 +212,6 @@ function preload() {
     this.load.spritesheet('laser', 'assets/lasoir.png', { frameWidth: 800, frameHeight: 200 });
     this.load.spritesheet('dude', 'assets/SoirMole.png', { frameWidth: 38, frameHeight: 25 });
 
-    this.load.image('beball', 'assets/sprites/beball1.png');
-    this.load.image('atari', 'assets/sprites/atari400.png');
-    this.load.image('bikkuriman', 'assets/sprites/bikkuriman.png');
-    this.load.image('bunny', 'assets/sprites/bunny.png');
-
     this.load.spritesheet('police', 'assets/Policemole.png', { frameWidth: 38, frameHeight: 25 });
 
     this.lsdPipeline = game.renderer.addPipeline('lsd', new LSDPipeline(game));
