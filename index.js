@@ -119,7 +119,6 @@ const specialDrugsList = [
 
             this.backgroundlayer.setPipeline("lsd");
             setTimeout(() => {
-                console.log("TIMEDOUUUUUUTLSD")
                 this.backgroundlayer.resetPipeline();
             }, 8000);
         },
@@ -151,7 +150,13 @@ const specialDrugsList = [
             console.log("AMANITE TUE MOUCHE taken")
 
             player.setPipeline("distort");
+            drugs.children.entries.forEach((drug) => {
+                drug.setPipeline("distort");
+            });
             setTimeout(() => {
+                drugs.children.entries.forEach((drug) => {
+                    drug.resetPipeline();
+                });
                 player.resetPipeline();
             }, 8000);
         },
@@ -399,7 +404,7 @@ function destroy2(_, elem) {
 function addDrug() {
     const type = Math.floor(Math.random() * 1) === 0 ? specialDrugsList[Math.floor(Math.random() * specialDrugsList.length)] : default_drug;
     const x = Math.floor(Math.random() * 800);
-    let drug = drugs.create(x, 0, type.sprite).setScale(0.5).setPipeline("distort");
+    let drug = drugs.create(x, 0, type.sprite).setScale(0.5);
     drug.setVelocity(0, 80);
     drug.type = type;
     drug.setAngularVelocity(Math.random() * 500 - 250);
