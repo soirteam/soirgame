@@ -302,16 +302,7 @@ function update() {
     }
 
     if (!digging && player.body) {
-        if (player.effect === 'lsd' && cursors.up.isDown) {
-            player.setVelocityY(-player.speed);
-        }
-        else if (cursors.down.isDown && player.body.blocked.down) {
-            dig(player);
-        }
-		if (cursors.down.isDown) {
-            player.setVelocityY(player.speed);
-        }
-        else if (cursors.left.isDown) {
+        if (cursors.left.isDown) {
             player.setVelocityX(-player.speed);
             turn_left = true;
 
@@ -335,13 +326,23 @@ function update() {
                 player.anims.play('turn_right');
             }
         }
-        if (cursors.up.isDown && player.body.blocked.down) {
+		if (player.effect === 'lsd' && cursors.up.isDown) {
+            player.setVelocityY(-player.speed);
+        }
+        else if (cursors.down.isDown && player.body.blocked.down) {
+            dig(player);
+        }
+		else if (cursors.down.isDown) {
+            player.setVelocityY(player.speed);
+        }
+		else if (cursors.up.isDown && player.body.blocked.down) {
             var jump = -330;
             if (player.effect === "cocain") {
                 jump -= 200;
             }
             player.setVelocityY(jump);
         }
+
     }
 
     if (Math.floor(Math.random() * 3000) === 0) {
