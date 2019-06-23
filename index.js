@@ -1,76 +1,4 @@
-var time = 0;
-
-var DistortPipeline = new Phaser.Class({
-    Extends: Phaser.Renderer.WebGL.Pipelines.TextureTintPipeline,
-    initialize:
-    function DistortPipeline (game)
-    {
-        Phaser.Renderer.WebGL.Pipelines.TextureTintPipeline.call(this, {
-            game: game,
-            renderer: game.renderer,
-            fragShader: `
-            precision mediump float;
-            uniform float     time;
-            uniform vec2      resolution;
-            uniform sampler2D uMainSampler;
-            varying vec2 outTexCoord;
-            void main( void ) {
-                vec2 uv = outTexCoord;
-                // uv.y *= -1.0;
-                uv.y += (sin((uv.x + (time * 0.5)) * 10.0) * 0.1) + (sin((uv.x + (time * 0.2)) * 32.0) * 0.01);
-                vec4 texColor = texture2D(uMainSampler, uv);
-                gl_FragColor = texColor;
-            }`
-        });
-    }
-});
-
-var LSDPipeline = new Phaser.Class({
-    Extends: Phaser.Renderer.WebGL.Pipelines.TextureTintPipeline,
-    initialize:
-    function LSDPipeline (game)
-    {
-        Phaser.Renderer.WebGL.Pipelines.TextureTintPipeline.call(this, {
-            game: game,
-            renderer: game.renderer,
-            fragShader: `
-            precision mediump float;
-
-            uniform sampler2D uMainSampler;
-            uniform vec2 uResolution;
-            uniform float uTime;
-
-            varying vec2 outTexCoord;
-            varying vec4 outTint;
-
-            vec4 plasma()
-            {
-                // vec2 pixelPos = gl_FragCoord.xy / uResolution * 15.0;
-                vec2 pixelPos = gl_FragCoord.xy / uResolution * 20.0;
-                float freq = 0.8;
-                float value =
-                    sin(uTime + pixelPos.x * freq) +
-                    sin(uTime + pixelPos.y * freq) +
-                    sin(uTime + (pixelPos.x + pixelPos.y) * freq) +
-                    cos(uTime + sqrt(length(pixelPos - 0.5)) * freq * 2.0);
-
-                return vec4(
-                    cos(value),
-                    sin(value),
-                    sin(value * 3.14 * 2.0),
-                    cos(value)
-                );
-            }
-            void main() 
-            {
-                vec4 texel = texture2D(uMainSampler, outTexCoord);
-                texel *= vec4(outTint.rgb * outTint.a, outTint.a);
-                gl_FragColor = texel * plasma();
-            }
-            `
-        });
-    }
-});
+import {DistortPipeline, LSDPipeline, AmanitePipeline} from "./shaders.js"
 
 const config = {
     type: Phaser.AUTO,
@@ -95,6 +23,7 @@ var polices;
 var police_number = 0;
 var drugs;
 var new_drugs_apply_effect_with_this_very_long_variable = false;
+var time = 0;
 var laser;
 var platforms;
 var cursors;
@@ -215,10 +144,13 @@ function preload() {
     this.load.spritesheet('police', 'assets/Policemole.png', { frameWidth: 38, frameHeight: 25 });
 
     this.lsdPipeline = game.renderer.addPipeline('lsd', new LSDPipeline(game));
-    this.lsdPipeline.setFloat2('uResolution', game.config.width, game.config.height);
+    this.lsdPipeline.setFloat2('resolution', game.config.width, game.config.height);
 
     this.distortPipeline = game.renderer.addPipeline('distort', new DistortPipeline(game));
     this.distortPipeline.setFloat2('resolution', game.config.width, game.config.height);
+
+    this.amanitePipeline = game.renderer.addPipeline('amanite', new AmanitePipeline(game));
+    this.amanitePipeline.setFloat2('uResolution', game.config.width, game.config.height);
 }
 
 function create() {
@@ -331,9 +263,10 @@ function create() {
 }
 
 function update() {
-    this.lsdPipeline.setFloat1("uTime", time);
+    this.lsdPipeline.setFloat1("time", time);
     this.distortPipeline.setFloat1("time", time);
-    time += 0.1;
+    this.amanitePipeline.setFloat1("uTime", time);
+    time += 0.05;
 
     if (gameOver) {
         player.anims.play('ded');
@@ -427,7 +360,8 @@ function destroy2(_, elem) {
 }
 
 function addDrug() {
-    const type = Math.floor(Math.random() * 20) === 0 ? specialDrugsList[Math.floor(Math.random() * specialDrugsList.length)] : default_drug;
+    // const type = Math.floor(Math.random() * 20) === 0 ? specialDrugsList[Math.floor(Math.random() * specialDrugsList.length)] : default_drug;
+    const type = Math.floor(Math.random() * 1) === 0 ? specialDrugsList[Math.floor(Math.random() * specialDrugsList.length)] : default_drug;
     const x = Math.floor(Math.random() * 800);
     let drug = drugs.create(x, 0, type.sprite).setScale(0.5);
     if (new_drugs_apply_effect_with_this_very_long_variable) {
