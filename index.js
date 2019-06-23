@@ -161,7 +161,7 @@ function preload() {
     this.load.image('default_pill', 'assets/default_pill.png');
     this.load.image('god', 'assets/god.png');
     this.load.spritesheet('laser', 'assets/lasoir.png', { frameWidth: 800, frameHeight: 200 });
-    this.load.spritesheet('dude', 'assets/SoirMole.png', { frameWidth: 38, frameHeight: 25 });
+    this.load.spritesheet('dude', 'assets/SoirMole.png', { frameWidth: 32, frameHeight: 22 });
 
     this.load.spritesheet('police', 'assets/Policemole.png', { frameWidth: 38, frameHeight: 25 });
 
