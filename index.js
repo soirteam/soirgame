@@ -424,6 +424,6 @@ function shootLaser() {
 }
 
 function endGame() {
-    this.add.text(240, 200, 'GAME OVER', { fontSize: '60px', fill: '#fff' });
+    this.add.text(240, 100, 'GAME OVER\n\nPRESS\nSPACEBAR\nTO\nRESTART', { fontSize: '60px', fill: '#fff' });
     gameOver = true
 }
