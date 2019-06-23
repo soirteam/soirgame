@@ -339,9 +339,7 @@ function update() {
         player.anims.play('ded');
         player.setVelocityX(0);
         if (cursors.space.isDown) {
-            gameOver = false
-            score = 0
-            this.scene.restart();
+            location.reload();
         }
         return;
     }
