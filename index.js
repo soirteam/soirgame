@@ -1,4 +1,4 @@
-import {DistortPipeline, LSDPipeline, ChampignonPipeline} from "./shaders.js"
+import { DistortPipeline, LSDPipeline, ChampignonPipeline } from "./shaders.js"
 
 const defaultAmbientColor = 0x666666;
 const config = {
@@ -326,16 +326,16 @@ function update() {
                 player.anims.play('turn_right');
             }
         }
-		if (player.effect === 'lsd' && cursors.up.isDown) {
+        if (player.effect === 'lsd' && cursors.up.isDown) {
             player.setVelocityY(-player.speed);
         }
         else if (cursors.down.isDown && player.body.blocked.down) {
             dig(player);
         }
-		else if (cursors.down.isDown) {
+        else if (cursors.down.isDown) {
             player.setVelocityY(player.speed);
         }
-		else if (cursors.up.isDown && player.body.blocked.down) {
+        else if (cursors.up.isDown && player.body.blocked.down) {
             var jump = -330;
             if (player.effect === "cocain") {
                 jump -= 200;
