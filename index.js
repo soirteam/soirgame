@@ -122,7 +122,7 @@ const specialDrugsList = [
                 lights.setAmbientColor(0x999999);
             }, 3000)
             lights.setAmbientColor(0xe6f2ff);
-            player.setVelocityY(-450);
+            player.setVelocityY(-650);
             console.log("COCAïN taken");
         },
         score: 60,
