@@ -424,6 +424,7 @@ function shootLaser() {
 }
 
 function endGame() {
-    this.add.text(240, 100, 'GAME OVER\n\nPRESS\nSPACEBAR\nTO\nRESTART', { fontSize: '60px', fill: '#fff' });
+    this.add.text(240, 120, 'GAME OVER', { fontSize: '60px', fill: '#f00' }).setPipeline("distort");
+    this.add.text(320, 210, 'PRESS\nSPACEBAR\nTO\nRESTART', { fontSize: '40px', fill: '#fff' }).setPipeline("champignon");
     gameOver = true
 }
