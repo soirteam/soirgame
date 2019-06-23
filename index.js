@@ -62,7 +62,7 @@ const specialDrugsList = [
             setTimeout(() => {
                 player.effect = undefined;
                 player.body.setAllowGravity(true);
-                this.backgroundlayer.resetPipeline();
+                this.backgroundlayer.setPipeline("Light2D");
             }, 8000);
         },
         score: 40,
@@ -131,8 +131,10 @@ const specialDrugsList = [
         sprite: 'champignon',
         effect: function() {
             this.backgroundlayer.setPipeline("champignon");
+            this.groundLayer.setPipeline("champignon");
             setTimeout(() => {
-                this.backgroundlayer.resetPipeline();
+                this.backgroundlayer.setPipeline("Light2D");
+                this.groundLayer.setPipeline("Light2D");
             }, 8000)
             console.log("CHAMPIGNON MAGIC taken");
         },
