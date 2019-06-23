@@ -52,7 +52,7 @@ const specialDrugsList = [
 				player.effect = undefined;
                 player.speed += 100
                 lights.setAmbientColor(0x999999);
-            }, 5000)
+            }, 10000)
             lights.setAmbientColor(0x33ff99);
             console.log("CANNABIS taken");
         },
@@ -111,7 +111,6 @@ function create() {
 
     this.lights.enable().setAmbientColor(0x999999);
     this.lights.addLight(400, 300, 300).setIntensity(1);
-    console.log(this.lights.getMaxVisibleLights());
 
     //  Our player animations, turning, walking left and walking right.
     this.anims.create({
@@ -191,12 +190,13 @@ function create() {
     scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '32px', fill: '#fff' });
 
     this.physics.add.collider(polices, this.groundLayer);
-    this.physics.add.collider(player, polices, endGame, null, this);
+    this.physics.add.overlap(player, polices, endGame, null, this);
     this.physics.add.collider(player, this.groundLayer);
 
+    this.physics.add.overlap(polices, laser, destroy2, null, this)
     this.physics.add.overlap(player, drugs, collectDrug, null, this);
     this.physics.add.overlap(player, laser, endGame, null, this)
-    this.physics.add.collider(drugs, this.groundLayer, drugHit, null, this);
+    this.physics.add.collider(drugs, this.groundLayer, destroy1, null, this);
 }
 
 function update() {
@@ -255,7 +255,7 @@ function update() {
 }
 
 function dig(player) {
-	const time_underground = (player.effect === 'cannabis') ? 2000 : 1000;
+	const time_underground = (player.effect === 'cannabis') ? 4000 : 1000;
 
     player.setVelocityX(0);
     digging = true;
@@ -283,8 +283,12 @@ function collectDrug(player, drug) {
     scoreText.setText('Score: ' + score);
 }
 
-function drugHit(drug, platform) {
-    drug.destroy();
+function destroy1(elem) {
+    elem.destroy();
+}
+
+function destroy2(_, elem) {
+    elem.destroy();
 }
 
 function addDrug() {
