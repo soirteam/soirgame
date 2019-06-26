@@ -3,3 +3,5 @@
 To play the game, `cd` into the repo then:
 - `python -m http.server`
 - visit `http://localhost:8000/` with your favorite web browser
+
+Or play it on https://soir.wtf/soirtaupe
